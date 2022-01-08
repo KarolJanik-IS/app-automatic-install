@@ -36,3 +36,25 @@
         daemon_reload: yes
         name: "{{ APP_NAME }}"
         state: restarted
+- hosts: proxy_nodes
+  become: yes
+  vars:
+    app_ips:
+      - 172.31.21.70:80
+  tasks:
+    - name: install epel
+      yum:
+        name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+        state: present
+    - name: install nginx
+      yum:
+        name: nginx
+        state: present
+    - name: put nginx conf
+      template:
+        src: files/proxy.conf
+        dest: /etc/nginx/conf.d/blog.conf
+    - name: reload nginx
+      systemd:
+        name: nginx
+        state: reloaded
